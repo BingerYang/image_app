@@ -23,12 +23,6 @@ with open("MAINTAINERS") as f:
     else:
         maintainer, maintainer_email = author, author_email
 
-license_path = "LICENSE"
-license = ''
-if os.path.exists(license_path):
-    with open(license_path) as f:
-        license = f.read()
-
 try:
     import pypandoc
 
@@ -45,7 +39,7 @@ setup(
     version=__version__,
     packages=find_packages(exclude=['examples', 'tests']),
     url='https://github.com/BingerYang/{}'.format(root),
-    license='',
+    license='MITT',
     author=author,
     author_email=author_email,
     maintainer=maintainer,

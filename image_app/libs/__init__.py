@@ -10,4 +10,4 @@ def box_connect(imageIntegral, anchors_in, h_gap, width, height):
     pass
 
 
-from libs.select_by_kp import select_by_kp, nms, box_connect
+from .select_by_kp import select_by_kp, nms, box_connect

@@ -1,11 +1,11 @@
 name = "image_app"
-version_info = (0, 0, 1, 2002614)
+version_info = (0, 0, 2, 2002617)
 __version__ = ".".join([str(v) for v in version_info])
 __description__ = '图片处理'
 
 __all__ = ["load_smooth_area", 'cv2pil', 'pil2cv']
 
-from PIL import Image, ImageFile
+from PIL import Image
 import cv2
 import numpy as np
 
@@ -22,7 +22,7 @@ def cv2pil(arr_img):
 
 
 def pil2cv(img):
-    assert isinstance(img, ImageFile.ImageFile)
+    assert isinstance(img, Image.Image)
     arr_img = cv2.cvtColor(np.asarray(img), cv2.COLOR_RGB2BGR)
     # cv2.imshow("OpenCV", arr_img)
     # cv2.waitKey()
