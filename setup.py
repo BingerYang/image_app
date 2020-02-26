@@ -28,6 +28,14 @@ license = ''
 if os.path.exists(license_path):
     with open(license_path) as f:
         license = f.read()
+
+try:
+    import pypandoc
+
+    long_description = pypandoc.convert('README.md', 'rst')
+except:
+    long_description = open('README.rst', encoding='utf-8').read()
+
 setup(
     name=name,
     # cmdclass={'build_ext': build_ext},
@@ -37,13 +45,13 @@ setup(
     version=__version__,
     packages=find_packages(exclude=['examples', 'tests']),
     url='https://github.com/BingerYang/{}'.format(root),
-    license=license,
+    license='',
     author=author,
     author_email=author_email,
     maintainer=maintainer,
     maintainer_email=maintainer_email,
     description=__description__,
-    long_description=open('README.rst', encoding='utf-8').read(),
+    long_description=long_description,
     long_description_content_type="text/x-rst",
 
     python_requires='>=3.4',

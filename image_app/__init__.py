@@ -1,5 +1,5 @@
 name = "image_app"
-version_info = (0, 0, 1, 2002521)
+version_info = (0, 0, 1, 2002614)
 __version__ = ".".join([str(v) for v in version_info])
 __description__ = '图片处理'
 

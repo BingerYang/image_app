@@ -3,9 +3,8 @@ image_app
 
 Documentation
 -------------
-生成文字图片：在一定的区域，支持换行，丢弃，缩小来完成适应区域
-The documentation is hosted at https://github.com/BingerYang/image_app
 
+The documentation is hosted at https://github.com/BingerYang/image_app
 
 Installation
 ------------
@@ -17,10 +16,9 @@ Installation
 Usage
 -----
 
-example:
 在一张图中找到连续相似的一片片长方向区域
 
-::
+.. code:: python
 
     # -*- coding: utf-8 -*-
     import os
@@ -34,5 +32,4 @@ example:
     cv2.imwrite('test.jpg', image)
     cv2.imshow("test", image)
     cv2.waitKey(3000)
-
 
