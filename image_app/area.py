@@ -47,23 +47,23 @@ def spreading_area(img, rect, align, offset, direct, limit=None):
         if is_similar_area:
             if align == 0:  # 做对齐
                 ymax = rect[index_2] + offset
-                if ymax > limit - 1:
+                if ymax - rect[index_1] + 1 > limit:
                     break
                 rect[index_2] = ymax
             elif align == 1:
                 ymin, ymax = rect[index_1] - offset, rect[index_2] + offset
-                if ymin < 0 or ymax > limit - 1:
+                if ymin < 0 or ymax - ymin + 1 > limit:
                     break
                 rect[index_1] = ymin
                 rect[index_2] = ymax
             else:
                 ymin = rect[index_1] - offset
-                if ymin < 0:
+                if ymin < 0 and rect[index_2] - ymin + 1 > limit:
                     rect[index_1] = ymin
                 rect[index_1] = ymin
         else:
             rect[index_1] = max(rect[index_1], 0)
-            rect[index_2] = min(rect[index_2], limit - 1)
+            # rect[index_2] = min(rect[index_2], limit - 1)
             break
     return rect
 
