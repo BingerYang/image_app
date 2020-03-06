@@ -1,5 +1,5 @@
 import cv2
-import numpy as np
+import math
 
 
 def judge_similar_area(img, x1, y1, x2, y2):
@@ -27,16 +27,20 @@ def judge_similar_area(img, x1, y1, x2, y2):
     return True
 
 
-def spreading_area(img, rect, align, offset, direct):
+def spreading_area(img, rect, align, offset, direct, limit=None):
     """
     对一个区域，向上下移动，找到安全的区域（区域不突变）
     :param rect:
     :param align:
     :param offset: 2
     :param direct: 0 y，1 x
+    :param limit:
     :return:
     """
-    limit = img.shape[direct]
+    if limit:
+        limit = min([limit, img.shape[direct]])
+    else:
+        limit = img.shape[direct]
     index_1, index_2 = (0, 2) if direct else (1, 3)
     while True:
         is_similar_area = judge_similar_area(img, *rect)
@@ -71,4 +75,50 @@ def multi_spreading_area(img, rect, factor_info):
         is_similar_area = judge_similar_area(img, *rect)
         if not is_similar_area:
             break
+    return rect
+
+
+def par_relarge_area(img, rect, xy_align, par):
+    x_align, y_align = xy_align
+    x_center, y_center = rect[0] + rect[2], rect[1] + rect[3]
+    while True:
+        is_similar_area = judge_similar_area(img, *rect)
+        if not is_similar_area:
+            break
+
+        if par > 1:
+            if y_align == 0:
+                rect[3] += 2
+            elif y_align == 1:
+                rect[1] -= 1
+                rect[3] += 1
+            else:
+                rect[1] -= 2
+
+            req = math.ceil((rect[3] - rect[1] + 1) * par)
+            if x_align == 0:
+                rect[2] = rect[0] + req - 1
+            elif x_align == 1:
+                rect[0] = int((x_center - req) / 2) + 1
+                rect[2] = req + rect[0] - 1
+            else:
+                rect[0] = rect[2] - req + 1
+        else:
+            if x_align == 0:
+                rect[2] += 2
+            elif x_align == 1:
+                rect[0] -= 1
+                rect[2] += 1
+            else:
+                rect[0] -= 2
+
+            req = math.ceil((rect[2] - rect[0] + 1) * par)
+            if y_align == 0:
+                rect[3] = rect[1] + req - 1
+            elif y_align == 1:
+                rect[1] = int((y_center - req) / 2)
+                rect[3] = req + rect[1] - 1
+            else:
+                rect[1] = rect[3] - req + 1
+
     return rect
