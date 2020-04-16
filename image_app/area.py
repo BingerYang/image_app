@@ -20,7 +20,7 @@ def judge_similar_area(img, x1, y1, x2, y2):
         return False
 
     crop = img[y1:y2, x1:x2]
-    crop = cv2.Canny(crop, 100, 200)  # 检查阈值边缘差距
+    crop = cv2.Canny(crop, 64, 128)  # 检查阈值边缘差距
     contours, _ = cv2.findContours(crop, cv2.RETR_TREE, cv2.CHAIN_APPROX_SIMPLE)
     if len(contours) > 0:
         return False
@@ -42,83 +42,89 @@ def spreading_area(img, rect, align, offset, direct, limit=None):
     else:
         limit = img.shape[direct]
     index_1, index_2 = (0, 2) if direct else (1, 3)
+    temp_rect = cur_rect = rect.copy()
     while True:
-        is_similar_area = judge_similar_area(img, *rect)
+        is_similar_area = judge_similar_area(img, *temp_rect)
         if is_similar_area:
+            cur_rect = temp_rect.copy()
             if align == 0:  # 做对齐
-                ymax = rect[index_2] + offset
-                if ymax - rect[index_1] + 1 > limit:
+                ymax = temp_rect[index_2] + offset
+                if ymax - temp_rect[index_1] + 1 > limit:
                     break
-                rect[index_2] = ymax
+                temp_rect[index_2] = ymax
             elif align == 1:
-                ymin, ymax = rect[index_1] - offset, rect[index_2] + offset
+                ymin, ymax = temp_rect[index_1] - offset, temp_rect[index_2] + offset
                 if ymin < 0 or ymax - ymin + 1 > limit:
                     break
-                rect[index_1] = ymin
-                rect[index_2] = ymax
+                temp_rect[index_1] = ymin
+                temp_rect[index_2] = ymax
             else:
-                ymin = rect[index_1] - offset
-                if ymin < 0 and rect[index_2] - ymin + 1 > limit:
-                    rect[index_1] = ymin
-                rect[index_1] = ymin
+                ymin = temp_rect[index_1] - offset
+                if ymin < 0 and temp_rect[index_2] - ymin + 1 > limit:
+                    temp_rect[index_1] = ymin
+                temp_rect[index_1] = ymin
         else:
-            rect[index_1] = max(rect[index_1], 0)
-            # rect[index_2] = min(rect[index_2], limit - 1)
+            cur_rect[index_1] = max(cur_rect[index_1], 0)
+            # cur_rect[index_2] = min(cur_rect[index_2], limit - 1)
             break
-    return rect
+    return cur_rect
 
 
 def multi_spreading_area(img, rect, factor_info):
+    temp_rect = rect.copy()
     while True:
+        cur_rect = temp_rect.copy()
         for index, factor in factor_info.items():
-            rect[index] += factor * (1 if index >= 2 else -1)
+            temp_rect[index] += factor * (1 if index >= 2 else -1)
         is_similar_area = judge_similar_area(img, *rect)
         if not is_similar_area:
             break
-    return rect
+    return cur_rect
 
 
 def par_relarge_area(img, rect, xy_align, par):
     x_align, y_align = xy_align
     x_center, y_center = rect[0] + rect[2], rect[1] + rect[3]
+    temp_rect = cur_rect = rect.copy()
     while True:
-        is_similar_area = judge_similar_area(img, *rect)
+        is_similar_area = judge_similar_area(img, *temp_rect)
         if not is_similar_area:
             break
 
+        cur_rect = temp_rect.copy()
         if par > 1:
             if y_align == 0:
-                rect[3] += 2
+                temp_rect[3] += 2
             elif y_align == 1:
-                rect[1] -= 1
-                rect[3] += 1
+                temp_rect[1] -= 1
+                temp_rect[3] += 1
             else:
-                rect[1] -= 2
+                temp_rect[1] -= 2
 
-            req = math.ceil((rect[3] - rect[1] + 1) * par)
+            req = math.ceil((temp_rect[3] - temp_rect[1] + 1) * par)
             if x_align == 0:
-                rect[2] = rect[0] + req - 1
+                temp_rect[2] = temp_rect[0] + req - 1
             elif x_align == 1:
-                rect[0] = int((x_center - req) / 2) + 1
-                rect[2] = req + rect[0] - 1
+                temp_rect[0] = int((x_center - req) / 2) + 1
+                temp_rect[2] = req + temp_rect[0] - 1
             else:
-                rect[0] = rect[2] - req + 1
+                temp_rect[0] = temp_rect[2] - req + 1
         else:
             if x_align == 0:
-                rect[2] += 2
+                temp_rect[2] += 2
             elif x_align == 1:
-                rect[0] -= 1
-                rect[2] += 1
+                temp_rect[0] -= 1
+                temp_rect[2] += 1
             else:
-                rect[0] -= 2
+                temp_rect[0] -= 2
 
-            req = math.ceil((rect[2] - rect[0] + 1) * par)
+            req = math.ceil((temp_rect[2] - temp_rect[0] + 1) * par)
             if y_align == 0:
-                rect[3] = rect[1] + req - 1
+                temp_rect[3] = temp_rect[1] + req - 1
             elif y_align == 1:
-                rect[1] = int((y_center - req) / 2)
-                rect[3] = req + rect[1] - 1
+                temp_rect[1] = int((y_center - req) / 2)
+                temp_rect[3] = req + temp_rect[1] - 1
             else:
-                rect[1] = rect[3] - req + 1
+                temp_rect[1] = temp_rect[3] - req + 1
 
-    return rect
+    return cur_rect
